@@ -24,7 +24,7 @@ class PlayList:
         if not self.queue:
             return None
         else:
-            song = self.queue[0]
+            song = self.queue.pop(0)
             self.history.append(song)
             return song
         

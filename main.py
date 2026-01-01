@@ -20,9 +20,35 @@ bot = commands.Bot(command_prefix=PREFIX, intents=intents, help_command=None)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
+    await load_extensions()
     
-    # await bot.add_cog(General(bot))
-    await bot.add_cog(Music(bot))
+    # Listar todos los comandos cargados
+    print("\n=== Comandos cargados ===")
+    for command in bot.commands:
+        print(f"  - {PREFIX}{command.name} (aliases: {command.aliases})")
+    print("========================\n")
+
+async def load_extensions():
+    try:
+        await bot.load_extension('cogs.general')
+        print("✓ General cog loaded successfully")
+    except Exception as e:
+        print(f"✗ Failed to load general: {e}")
+    
+    try:
+        await bot.load_extension('cogs.music')
+        print("✓ Music cog loaded successfully")
+    except Exception as e:
+        print(f"✗ Failed to load music: {e}")
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(f"❌ Comando no encontrado. Usa {PREFIX}help para ver comandos disponibles.")
+        print(f"Command not found: {ctx.message.content}")
+    else:
+        await ctx.send(f"Error: {error}")
+        print(f"Command error: {error}")
 
 @bot.event
 async def on_disconnect():

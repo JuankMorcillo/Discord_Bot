@@ -38,5 +38,5 @@ class General(commands.Cog):
         else:
             await ctx.send('I am not connected to any voice channel.')
 
-def setup(bot):
-    bot.add_cog(General(bot))
+async def setup(bot):
+    await bot.add_cog(General(bot))

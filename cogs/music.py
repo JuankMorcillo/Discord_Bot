@@ -5,6 +5,7 @@ from model.song import Song
 from model.playlist import PlayList
 import yt_dlp
 from typing import Any
+# import pandas as pd
 
 class Music (commands.Cog):
     def __init__(self, bot):
@@ -13,8 +14,11 @@ class Music (commands.Cog):
         
     
     def search_song(self, query: str):
-        videos_search = VideosSearch(query, limit = 1)
+        videos_search = VideosSearch(query, limit=20)
         result: Any = videos_search.result()
+
+        # print(f"Search result for '{query}': {pd.DataFrame(result['result'])}")
+
         if isinstance(result, dict) and result.get('result'):
             video_info = result['result'][0]
             title = video_info['title']
@@ -93,10 +97,19 @@ class Music (commands.Cog):
             await ctx.send("Resumed the current song.")
         else:
             await ctx.send("No song is currently paused.")
-            
+    
+    @commands.command(name='disconnect', aliases=['dc'])
+    async def disconnect(self, ctx):
+        """Desconectar el bot del canal de voz"""
+        if not ctx.voice_client:
+            await ctx.send("Not connected to a voice channel.")
+            return
+        
+        await ctx.voice_client.disconnect()
+        await ctx.send("Disconnected from voice channel.")
+        self.playlist = PlayList()  # Limpiar la playlist
 
-def setup(bot):
-    bot.add_cog(Music(bot))
-        
-        
-        
+async def setup(bot):
+    await bot.add_cog(Music(bot))
+
+

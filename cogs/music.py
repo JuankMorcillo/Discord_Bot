@@ -136,11 +136,13 @@ class Music(commands.Cog):
             await ctx.send("Song not found.")
             return
             
-        # Si ya está reproduciendo, añadir a la cola
+        # Se agrega a cola asi no este reproduciendo
         if ctx.voice_client.is_playing():
             self.playlist.add_to_queue(song)
             await ctx.send(f'Added to queue: {song.title}')
         else:
+            print(f"Playing song immediately: {song.title}")
+            self.playlist.add_to_queue(song)
             await self.play_song(ctx, song)
     
     @commands.command(name='skip')
@@ -189,6 +191,24 @@ class Music(commands.Cog):
         await ctx.voice_client.disconnect()
         await ctx.send("Disconnected from voice channel.")
         self.playlist = PlayList()  # Limpiar la playlist
+
+    @commands.command(name='queue')
+    async def queue(self, ctx):
+        if self.playlist.is_empty():
+            await ctx.send("The queue is empty.")
+            return
+        
+        queue_list = [f"{idx + 1}. {song.title}" for idx, song in enumerate(self.playlist.queue)]
+        queue_message = "Current Queue:\n" + "\n".join(queue_list)
+        await ctx.send(queue_message)
+        
+    @commands.command(name='loop')
+    async def loop(self, ctx):
+        self.playlist.loop = not self.playlist.loop
+        status = "enabled" if self.playlist.loop else "disabled"
+        await ctx.send(f"Looping is now {status}.")
+        
+                
 
 async def setup(bot):
     await bot.add_cog(Music(bot))

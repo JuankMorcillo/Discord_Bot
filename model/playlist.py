@@ -22,7 +22,11 @@ class PlayList:
     
     def next_song(self):
         if not self.queue:
-            return None
+            return None        
+        if self.loop:
+            song = self.queue[0]
+            self.history.append(song)
+            return song        
         else:
             song = self.queue.pop(0)
             self.history.append(song)
@@ -30,5 +34,8 @@ class PlayList:
         
     def clear_queue(self):
         self.queue = []
+        
+    def is_empty(self):
+        return len(self.queue) == 0
             
         
